@@ -6,11 +6,35 @@ import heroBg from "../images/HTPheader.jpg";
 import EventFilters from "../components/EventFilters";
 import { useFavorites } from "../context/FavoritesContext";
 
+/* ── Haversine distance in miles ── */
+function haversineMiles(lat1, lon1, lat2, lon2) {
+  const R = 3958.8;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
 /* ── tiny EventCard used only on landing ── */
-function LandingEventCard({ event }) {
+const DESC_LIMIT = 150;
+
+function LandingEventCard({ event, userCoords }) {
   const navigate = useNavigate();
   const { isSaved, toggle } = useFavorites();
   const saved = isSaved(event.id);
+  const [descExpanded, setDescExpanded] = useState(false);
+
+  const distanceMiles =
+    userCoords && event.latitude && event.longitude
+      ? haversineMiles(userCoords.lat, userCoords.lng, event.latitude, event.longitude)
+      : null;
+
+  const desc = event.description || "";
+  const isLong = desc.length > DESC_LIMIT;
+  const displayDesc = !isLong || descExpanded ? desc : desc.slice(0, DESC_LIMIT).trimEnd() + "…";
 
   const imageUrl = event.image
     ? event.image.startsWith("http") ? event.image : `http://localhost:8000${event.image}`
@@ -77,9 +101,27 @@ function LandingEventCard({ event }) {
 
       {/* Body */}
       <div style={{ padding: "14px 16px 16px" }}>
-        <h3 style={{ color: "#fff", fontWeight: 700, fontSize: 15, lineHeight: 1.35, marginBottom: 10, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+        <h3 style={{ color: "#fff", fontWeight: 700, fontSize: 15, lineHeight: 1.35, marginBottom: 8, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {event.title}
         </h3>
+
+        {/* Description preview — Instagram-style expand */}
+        {desc && (
+          <div style={{ marginBottom: 10 }}>
+            <span style={{ color: "#bbb", fontSize: 12, lineHeight: 1.5 }}>
+              {displayDesc}
+            </span>
+            {isLong && (
+              <button
+                onClick={e => { e.stopPropagation(); setDescExpanded(v => !v); }}
+                style={{ background: "none", border: "none", color: "#ff00e0", fontSize: 12, fontWeight: 700, cursor: "pointer", padding: "0 0 0 4px" }}
+              >
+                {descExpanded ? "less" : "more"}
+              </button>
+            )}
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <svg width="14" height="14" fill="none" stroke="#ff00e0" strokeWidth="2" viewBox="0 0 24 24">
@@ -87,6 +129,18 @@ function LandingEventCard({ event }) {
             </svg>
             <span style={{ color: "#aaa", fontSize: 12 }}>{format(new Date(event.date), "EEE, MMM d · h:mm a")}</span>
           </div>
+          {/* Venue name */}
+          {(event.venue?.name || event.location) && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" fill="none" stroke="#ff00e0" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span style={{ color: "#aaa", fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {event.venue?.name || event.location}
+              </span>
+            </div>
+          )}
+          {/* City */}
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <svg width="14" height="14" fill="none" stroke="#ff00e0" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -94,17 +148,84 @@ function LandingEventCard({ event }) {
             </svg>
             <span style={{ color: "#aaa", fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{event.city || event.location}</span>
           </div>
+          {distanceMiles !== null && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" fill="none" stroke="#ff00e0" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" />
+              </svg>
+              <span style={{ color: "#ff00e0", fontSize: 12, fontWeight: 600 }}>
+                {distanceMiles < 0.1 ? "< 0.1" : distanceMiles.toFixed(1)} mi away
+              </span>
+            </div>
+          )}
         </div>
+        {/* GO button */}
+        <a
+          href={
+            event.latitude && event.longitude
+              ? `https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`
+              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event.venue?.name ? event.venue.name + ' ' : '') + (event.city || event.location || ''))}`
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            marginTop: 10,
+            padding: "8px",
+            borderRadius: 6,
+            background: "rgba(255,0,224,0.1)",
+            border: "1px solid rgba(255,0,224,0.35)",
+            color: "#ff00e0",
+            fontSize: 12,
+            fontWeight: 700,
+            textDecoration: "none",
+            letterSpacing: "0.04em",
+            transition: "background 0.2s, border-color 0.2s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#ff00e0"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,0,224,0.1)"; e.currentTarget.style.color = "#ff00e0"; }}
+        >
+          {/* Navigation arrow icon */}
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          GO — Get Directions
+        </a>
+
         {/* share strip */}
-        <div style={{ display: "flex", gap: 8, marginTop: 12, paddingTop: 12, borderTop: "1px solid #333" }}>
-          <button onClick={e => e.stopPropagation()} style={{ background: "#333", border: "none", borderRadius: 4, padding: "4px 10px", color: "#aaa", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 8, paddingTop: 10, borderTop: "1px solid #333" }}>
+          {/* SMS */}
+          <a
+            href={`sms:?body=Check out this upcoming event: ${event.title} — ${window.location.origin}/events/${event.id}`}
+            onClick={e => e.stopPropagation()}
+            style={{ background: "#25D366", borderRadius: 4, padding: "4px 10px", color: "#fff", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, textDecoration: "none" }}
+          >
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+            </svg>
+            SMS
+          </a>
+          {/* Facebook */}
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${window.location.origin}/events/${event.id}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            style={{ background: "#1877F2", borderRadius: 4, padding: "4px 10px", color: "#fff", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, textDecoration: "none" }}
+          >
             <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-            Share
-          </button>
-          <button onClick={e => e.stopPropagation()} style={{ background: "#333", border: "none", borderRadius: 4, padding: "4px 10px", color: "#aaa", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+            Facebook
+          </a>
+          {/* Email */}
+          <a
+            href={`mailto:?subject=${encodeURIComponent(event.title)}&body=${encodeURIComponent(`Check out this upcoming event: ${event.title}\n${window.location.origin}/events/${event.id}`)}`}
+            onClick={e => e.stopPropagation()}
+            style={{ background: "#333", borderRadius: 4, padding: "4px 10px", color: "#aaa", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, textDecoration: "none" }}
+          >
             <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
             Email
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -137,6 +258,16 @@ export default function Landing() {
   const [totalCount, setTotalCount] = useState(0);
   const [activeFilters, setActiveFilters] = useState({});
 
+  // ── Nearby events state ──
+  const [nearbyEvents, setNearbyEvents] = useState([]);
+  const [nearbyRadius, setNearbyRadius] = useState(null);
+  const [nearbyStatus, setNearbyStatus] = useState("idle"); // idle | requesting | loading | done | denied | error
+
+  // ── Stored GPS coords (shared between "Near You" section + radius filter) ──
+  const [userCoords, setUserCoords] = useState(null); // { lat, lng }
+  const [radiusFilterActive, setRadiusFilterActive] = useState(false);
+  const [locationDenied, setLocationDenied] = useState(false);
+
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const fetchEvents = useCallback(async (params = {}, pageNum = 1) => {
@@ -156,9 +287,76 @@ export default function Landing() {
 
   useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
-  const handleFilter = (params) => {
-    setActiveFilters(params);
-    fetchEvents(params, 1);
+  // Request GPS on mount and load nearby events
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    setNearbyStatus("requesting");
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        setNearbyStatus("loading");
+        const { latitude: lat, longitude: lng } = pos.coords;
+        setUserCoords({ lat, lng });
+        try {
+          const { data } = await api.get("/events/nearby/", { params: { lat, lng } });
+          setNearbyEvents(data.results || []);
+          setNearbyRadius(data.radius_miles);
+          setNearbyStatus("done");
+        } catch {
+          setNearbyStatus("error");
+        }
+      },
+      () => { setNearbyStatus("denied"); setLocationDenied(true); },
+      { timeout: 8000 }
+    );
+  }, []);
+
+  const handleFilter = async (params) => {
+    const { radius, ...restParams } = params;
+
+    if (radius) {
+      // Radius filter: use nearby endpoint
+      setRadiusFilterActive(true);
+      setActiveFilters(params);
+
+      // We need coords — try to get them if not already available
+      const doNearbyFetch = async (lat, lng) => {
+        setLoading(true);
+        try {
+          const { data } = await api.get("/events/nearby/", { params: { lat, lng, radius } });
+          setEvents(data.results || []);
+          setTotalCount(data.count || 0);
+          setPage(1);
+        } catch {
+          setEvents([]);
+          setTotalCount(0);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      if (userCoords) {
+        doNearbyFetch(userCoords.lat, userCoords.lng);
+      } else if (!navigator.geolocation) {
+        setLocationDenied(true);
+      } else {
+        setLoading(true);
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            setUserCoords({ lat, lng });
+            setLocationDenied(false);
+            doNearbyFetch(lat, lng);
+          },
+          () => { setLocationDenied(true); setLoading(false); },
+          { timeout: 8000 }
+        );
+      }
+    } else {
+      // Normal filter: use regular endpoint
+      setRadiusFilterActive(false);
+      setActiveFilters(restParams);
+      fetchEvents(restParams, 1);
+    }
   };
 
   const goToPage = (pageNum) => {
@@ -248,6 +446,41 @@ export default function Landing() {
         </a>
       </div>
 
+      {/* ── EVENTS NEAR YOU ── */}
+      {(nearbyStatus === "loading" || nearbyStatus === "done") && (
+        <div style={{ background: "#1d191e", borderTop: "1px solid #2a2a2a", borderBottom: "1px solid #2a2a2a", padding: "40px 20px" }}>
+          <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+            {/* heading */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
+              <span style={{ fontSize: 22 }}>📍</span>
+              <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: 0 }}>
+                Events Near You
+              </h2>
+              {nearbyRadius && (
+                <span style={{ color: "#ff00e0", fontSize: 13, fontWeight: 600, background: "rgba(255,0,224,0.1)", border: "1px solid rgba(255,0,224,0.3)", borderRadius: 4, padding: "2px 10px" }}>
+                  within {nearbyRadius} miles
+                </span>
+              )}
+              <div style={{ flex: 1, height: 1, background: "#2a2a2a" }} />
+            </div>
+
+            {nearbyStatus === "loading" ? (
+              <div style={{ display: "flex", justifyContent: "center", padding: "40px 0" }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", border: "3px solid transparent", borderTopColor: "#ff00e0", borderRightColor: "#ff00e0", animation: "spin 0.8s linear infinite" }} />
+              </div>
+            ) : nearbyEvents.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "32px 0", color: "#555" }}>
+                <p style={{ fontSize: 15 }}>No upcoming events found within {nearbyRadius} miles of your location.</p>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+                {nearbyEvents.map(event => <LandingEventCard key={event.id} event={event} userCoords={userCoords} />)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── EVENT LISTINGS ── */}
       <div id="event-listings" style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 20px 60px" }}>
 
@@ -256,14 +489,36 @@ export default function Landing() {
           <EventFilters onFilter={handleFilter} />
         </div>
 
+        {/* Location denied warning */}
+        {locationDenied && radiusFilterActive && (
+          <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", padding: "12px 16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "18px" }}>📍</span>
+            <p style={{ color: "#f87171", fontSize: "13px", margin: 0 }}>
+              Location access was denied. Please allow location access in your browser settings to use the radius filter.
+            </p>
+          </div>
+        )}
+
         {/* Section heading */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
-          <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: 0 }}>Upcoming Events</h2>
+          <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: 0 }}>
+            {radiusFilterActive && activeFilters.radius
+              ? `Events Within ${activeFilters.radius} Mile${activeFilters.radius !== 1 ? "s" : ""}`
+              : "Upcoming Events"}
+          </h2>
+          {radiusFilterActive && activeFilters.radius && (
+            <span style={{ color: "#ff00e0", fontSize: 12, fontWeight: 600, background: "rgba(255,0,224,0.1)", border: "1px solid rgba(255,0,224,0.3)", borderRadius: 4, padding: "2px 10px" }}>
+              📍 Near You
+            </span>
+          )}
           <div style={{ flex: 1, height: 1, background: "#2a2a2a" }} />
-          {!loading && totalCount > 0 && (
+          {!loading && totalCount > 0 && !radiusFilterActive && (
             <span style={{ color: "#555", fontSize: 13 }}>
               {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount}
             </span>
+          )}
+          {!loading && radiusFilterActive && (
+            <span style={{ color: "#555", fontSize: 13 }}>{events.length} found</span>
           )}
         </div>
 
@@ -281,14 +536,14 @@ export default function Landing() {
           <>
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+              gridTemplateColumns: "repeat(3, 1fr)",
               gap: 20,
             }}>
-              {events.map(event => <LandingEventCard key={event.id} event={event} />)}
+              {events.map(event => <LandingEventCard key={event.id} event={event} userCoords={userCoords} />)}
             </div>
 
             {/* ── PAGINATION ── */}
-            {totalPages > 1 && (
+            {totalPages > 1 && !radiusFilterActive && (
               <div style={{ marginTop: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flexWrap: "wrap" }}>
 
                 {/* Previous */}

@@ -19,6 +19,7 @@ export default function AdminLayout({ children }) {
     { to: "/admin/venues", label: "Venues", icon: "🏟️" },
     { to: "/admin/users", label: "Users", icon: "👥" },
     { to: "/admin/categories", label: "Categories", icon: "🏷️" },
+    { to: "/admin/settings", label: "Settings", icon: "⚙️" },
   ];
 
   const isActive = (path) => location.pathname === path;

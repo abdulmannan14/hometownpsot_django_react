@@ -12,6 +12,7 @@ from .views import (
     EventImageDeleteView,
     VenueImageUploadView,
     VenueImageDeleteView,
+    NearbyEventsView,
 )
 from .views_saved import SavedEventListView, SaveEventView
 
@@ -30,4 +31,5 @@ urlpatterns = [
     path("venue-images/<int:pk>/", VenueImageDeleteView.as_view(), name="venue-image-delete"),
     path("<int:pk>/images/", EventImageUploadView.as_view(), name="event-image-upload"),
     path("images/<int:pk>/", EventImageDeleteView.as_view(), name="event-image-delete"),
+    path("nearby/", NearbyEventsView.as_view(), name="events-nearby"),
 ]

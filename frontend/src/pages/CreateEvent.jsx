@@ -82,7 +82,7 @@ export default function CreateEvent() {
         <div className="max-w-3xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#ff00e0" }}>Organizers</p>
           <h1 className="text-2xl font-bold text-white">Post a New Event</h1>
-          <p className="text-gray-500 text-sm mt-1">Events are reviewed before being published publicly.</p>
+          <p className="text-gray-500 text-sm mt-1">Your event will be published immediately after submission.</p>
         </div>
       </div>
 

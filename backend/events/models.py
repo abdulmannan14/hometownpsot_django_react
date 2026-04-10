@@ -75,7 +75,7 @@ class Event(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="events")
     organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="events")
     image = models.ImageField(upload_to="events/", blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_APPROVED)
     is_featured = models.BooleanField(default=False)
     organizer_name = models.CharField(max_length=255, blank=True)
     organizer_email = models.EmailField(blank=True)

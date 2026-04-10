@@ -20,6 +20,7 @@ import AdminVenues from "./pages/AdminVenues";
 import AdminUsers from "./pages/AdminUsers";
 import AdminCategories from "./pages/AdminCategories";
 import AdminExpiredEvents from "./pages/AdminExpiredEvents";
+import AdminSettings from "./pages/AdminSettings";
 import RegisterPopup from "./components/RegisterPopup";
 
 function Footer() {
@@ -119,6 +120,7 @@ function AppContent() {
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
           <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
           <Route path="/admin/expired" element={<AdminRoute><AdminExpiredEvents /></AdminRoute>} />
+          <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
         </Routes>
       </main>
       {!isAdminRoute && <Footer />}

@@ -26,6 +26,7 @@ VENUE_HOUR_FIELDS = [
 
 class VenueSerializer(serializers.ModelSerializer):
     images = VenueImageSerializer(many=True, read_only=True)
+    upcoming_event_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Venue
@@ -36,7 +37,13 @@ class VenueSerializer(serializers.ModelSerializer):
             "weekday_open", "weekday_close", "weekday_is_24h",
             "saturday_open", "saturday_close", "saturday_is_24h",
             "sunday_open", "sunday_close", "sunday_is_24h",
+            "upcoming_event_count",
         ]
+
+    def get_upcoming_event_count(self, obj):
+        from django.utils import timezone
+        from .models import Event
+        return obj.events.filter(status=Event.STATUS_APPROVED, date__gte=timezone.now()).count()
 
     def validate(self, attrs):
         # Convert empty strings sent from the frontend to None for TimeFields
@@ -93,7 +100,7 @@ class EventListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = [
-            "id", "title", "date", "location", "city",
+            "id", "title", "description", "date", "location", "city",
             "category", "venue", "image", "images", "is_featured", "status",
             "organizer_name_display", "latitude", "longitude", "view_count"
         ]

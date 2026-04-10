@@ -14,6 +14,7 @@ from .views import (
     AdminCategoryListView,
     AdminCategoryDetailView,
     ExpiredEventsView,
+    SiteSettingsView,
 )
 
 app_name = "admin_panel"
@@ -40,4 +41,7 @@ urlpatterns = [
     # Categories
     path("categories/", AdminCategoryListView.as_view(), name="category-list"),
     path("categories/<int:pk>/", AdminCategoryDetailView.as_view(), name="category-detail"),
+
+    # Site Settings
+    path("settings/", SiteSettingsView.as_view(), name="site-settings"),
 ]

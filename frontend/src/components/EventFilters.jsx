@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axios";
 
+const RADIUS_OPTIONS = [1, 3, 5, 10, 30, 60];
+
 export default function EventFilters({ onFilter }) {
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
   const [dateFrom, setDateFrom] = useState("");
+  const [radius, setRadius] = useState("");
 
   useEffect(() => {
     api.get("/events/categories/").then(({ data }) => setCategories(data.results ?? data)).catch(() => {});
@@ -19,11 +22,12 @@ export default function EventFilters({ onFilter }) {
     if (category) params.category = category;
     if (city) params.city = city;
     if (dateFrom) params.date_from = dateFrom;
+    if (radius) params.radius = parseInt(radius);
     onFilter(params);
   };
 
   const handleReset = () => {
-    setSearch(""); setCategory(""); setCity(""); setDateFrom("");
+    setSearch(""); setCategory(""); setCity(""); setDateFrom(""); setRadius("");
     onFilter({});
   };
 
@@ -36,7 +40,7 @@ export default function EventFilters({ onFilter }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ background: "#1d191e", border: "1px solid #2a2a2a" }} className="rounded-xl p-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Search */}
         <div>
           <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">Search</label>
@@ -58,12 +62,7 @@ export default function EventFilters({ onFilter }) {
         {/* Category */}
         <div>
           <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">Category</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="input"
-            style={inputStyle}
-          >
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="input" style={inputStyle}>
             <option value="">All Categories</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -101,7 +100,36 @@ export default function EventFilters({ onFilter }) {
             style={{ ...inputStyle, colorScheme: "dark" }}
           />
         </div>
+
+        {/* Radius */}
+        <div>
+          <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: radius ? "#ff00e0" : "#9ca3af" }}>
+            📍 Radius
+          </label>
+          <select
+            value={radius}
+            onChange={(e) => setRadius(e.target.value)}
+            className="input"
+            style={{
+              ...inputStyle,
+              borderColor: radius ? "#ff00e0" : "#3a3a3a",
+              color: radius ? "#ff00e0" : "#fff",
+            }}
+          >
+            <option value="">Any Distance</option>
+            {RADIUS_OPTIONS.map((r) => (
+              <option key={r} value={r}>{r} mile{r !== 1 ? "s" : ""}</option>
+            ))}
+          </select>
+        </div>
       </div>
+
+      {/* Radius hint */}
+      {radius && (
+        <p style={{ color: "#fff", fontSize: "11px", marginTop: "8px" }}>
+          📍 Radius filter uses your device location. Make sure location access is allowed in your browser.
+        </p>
+      )}
 
       <div className="flex gap-3 mt-4">
         <button type="submit" className="btn-primary text-sm px-6">Search Events</button>

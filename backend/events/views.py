@@ -1,3 +1,4 @@
+import math
 from rest_framework import generics, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +7,16 @@ from django.db.models import F
 from .models import Event, Category, Venue, EventImage, VenueImage
 from .serializers import EventSerializer, EventListSerializer, CategorySerializer, VenueSerializer, EventImageSerializer, VenueImageSerializer
 from .filters import EventFilter
+
+
+def haversine_miles(lat1, lon1, lat2, lon2):
+    """Return distance in miles between two lat/lng points."""
+    R = 3958.8  # Earth radius in miles
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    return 2 * R * math.asin(math.sqrt(a))
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -30,15 +41,19 @@ class EventListCreateView(generics.ListCreateAPIView):
     ordering = ["date"]
 
     def get_queryset(self):
+        from django.utils import timezone
+        now = timezone.now()
         user = self.request.user
         if user.is_authenticated and (user.is_staff or getattr(user, 'role', None) == 'admin'):
-            return Event.objects.select_related("organizer", "category").prefetch_related("images").all()
+            return Event.objects.select_related("organizer", "category", "venue").prefetch_related("images").all().order_by("date")
         if user.is_authenticated:
             from django.db.models import Q
-            return Event.objects.select_related("organizer", "category").prefetch_related("images").filter(
-                Q(status=Event.STATUS_APPROVED) | Q(organizer=user)
-            )
-        return Event.objects.select_related("organizer", "category").prefetch_related("images").filter(status=Event.STATUS_APPROVED)
+            return Event.objects.select_related("organizer", "category", "venue").prefetch_related("images").filter(
+                Q(status=Event.STATUS_APPROVED, date__gte=now) | Q(organizer=user)
+            ).order_by("date")
+        return Event.objects.select_related("organizer", "category", "venue").prefetch_related("images").filter(
+            status=Event.STATUS_APPROVED, date__gte=now
+        ).order_by("date")
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -233,3 +248,60 @@ class VenueImageDeleteView(APIView):
         img.image.delete(save=False)
         img.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class NearbyEventsView(APIView):
+    """
+    GET /api/events/nearby/?lat=<lat>&lng=<lng>&radius=<miles>
+    Returns approved upcoming events within `radius` miles of the given point.
+    If `radius` is omitted, falls back to the admin-configured default.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        try:
+            user_lat = float(request.query_params["lat"])
+            user_lng = float(request.query_params["lng"])
+        except (KeyError, ValueError, TypeError):
+            return Response({"detail": "lat and lng query params are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get radius — use query param if provided, otherwise admin setting
+        try:
+            radius = float(request.query_params.get("radius", 0))
+            if radius <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            from admin_panel.models import SiteSettings
+            radius = SiteSettings.get().default_radius_miles
+
+        # Bounding box pre-filter (cheap SQL, ~69 miles per degree lat)
+        lat_delta = radius / 69.0
+        lng_delta = radius / (69.0 * math.cos(math.radians(user_lat))) if math.cos(math.radians(user_lat)) != 0 else radius / 69.0
+
+        from django.utils import timezone
+        now = timezone.now()
+
+        qs = (
+            Event.objects
+            .filter(status=Event.STATUS_APPROVED, date__gte=now)
+            .filter(
+                latitude__isnull=False, longitude__isnull=False,
+                latitude__gte=user_lat - lat_delta,
+                latitude__lte=user_lat + lat_delta,
+                longitude__gte=user_lng - lng_delta,
+                longitude__lte=user_lng + lng_delta,
+            )
+            .select_related("category", "venue")
+            .prefetch_related("images")
+            .order_by("date")
+        )
+
+        # Refine with exact Haversine distance
+        nearby = []
+        for event in qs:
+            dist = haversine_miles(user_lat, user_lng, event.latitude, event.longitude)
+            if dist <= radius:
+                nearby.append(event)
+
+        serializer = EventListSerializer(nearby, many=True, context={"request": request})
+        return Response({"count": len(nearby), "radius_miles": radius, "results": serializer.data})

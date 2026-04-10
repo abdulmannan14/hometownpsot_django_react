@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from events.models import Event, Category
 from users.models import User
+from .models import SiteSettings
 from .serializers import (
     AdminEventSerializer,
     AdminUserSerializer,
@@ -246,3 +247,34 @@ class ExpiredEventsView(APIView):
         expired = self._expired_qs()
         count, _ = expired.delete()
         return Response({"deleted": count}, status=status.HTTP_200_OK)
+
+
+class SiteSettingsView(APIView):
+    """
+    GET  /api/admin/settings/  — returns current settings (public, no auth needed for GET)
+    PATCH /api/admin/settings/ — update settings (admin only)
+    """
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [AdminPermission()]
+
+    def get(self, request):
+        settings = SiteSettings.get()
+        return Response({"default_radius_miles": settings.default_radius_miles})
+
+    def patch(self, request):
+        radius = request.data.get("default_radius_miles")
+        if radius is None:
+            return Response({"detail": "default_radius_miles is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            radius = int(radius)
+            if radius <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            return Response({"detail": "Must be a positive integer."}, status=status.HTTP_400_BAD_REQUEST)
+        settings = SiteSettings.get()
+        settings.default_radius_miles = radius
+        settings.save()
+        return Response({"default_radius_miles": settings.default_radius_miles})

@@ -119,7 +119,7 @@ export default function EditEvent() {
       <div style={{ background: "#0a0a0a", borderBottom: "1px solid #2a2a2a" }} className="px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-2xl font-bold text-white">Edit Event</h1>
-          <p className="text-gray-500 text-sm mt-1">Changes will go back to pending review.</p>
+          <p className="text-gray-500 text-sm mt-1">Update your event details below.</p>
         </div>
       </div>
 
