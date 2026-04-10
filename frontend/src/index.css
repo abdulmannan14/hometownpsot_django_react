@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #191919;
+  color: #ffffff;
+  margin: 0;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 font-semibold rounded-md transition-all duration-200 text-sm;
+    background: #ff00e0;
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    background: transparent;
+    color: #ff00e0;
+    outline: 2px solid #ff00e0;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 font-semibold rounded-md transition-all duration-200 text-sm;
+    background: #1e191f;
+    color: #ffffff;
+    border: 1px solid #444;
+  }
+  .btn-secondary:hover {
+    border-color: #ff00e0;
+    color: #ff00e0;
+  }
+  .input {
+    @apply block w-full px-3 py-2.5 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all;
+    background: #252525;
+    border: 1px solid #3a3a3a;
+  }
+  .input:focus {
+    border-color: #ff00e0;
+    --tw-ring-color: rgba(255,0,224,0.3);
+  }
+  .card {
+    background: #252525;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(255,0,224,0.15);
+  }
+  .magenta { color: #ff00e0; }
+  .bg-magenta { background: #ff00e0; }
+  .border-magenta { border-color: #ff00e0; }
+}
