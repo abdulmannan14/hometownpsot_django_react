@@ -34,6 +34,7 @@ class VenueSerializer(serializers.ModelSerializer):
             "id", "name", "address", "city", "latitude", "longitude",
             "website", "phone", "description", "capacity", "image", "images",
             "facebook", "instagram", "twitter", "youtube", "tiktok", "linkedin",
+            "is_featured",
             "weekday_open", "weekday_close", "weekday_is_24h",
             "saturday_open", "saturday_close", "saturday_is_24h",
             "sunday_open", "sunday_close", "sunday_is_24h",
@@ -75,7 +76,8 @@ class EventSerializer(serializers.ModelSerializer):
             "venue", "venue_detail", "latitude", "longitude",
             "organizer", "image", "images", "status", "is_featured",
             "organizer_name", "organizer_email", "organizer_phone",
-            "website", "view_count", "created_at", "updated_at",
+            "website", "ticket_price", "ticket_purchase_link",
+            "view_count", "created_at", "updated_at",
         ]
         read_only_fields = ["id", "organizer", "status", "view_count", "created_at", "updated_at"]
 
@@ -102,7 +104,9 @@ class EventListSerializer(serializers.ModelSerializer):
         fields = [
             "id", "title", "description", "date", "location", "city",
             "category", "venue", "image", "images", "is_featured", "status",
-            "organizer_name_display", "latitude", "longitude", "view_count"
+            "organizer_name_display", "organizer",
+            "latitude", "longitude", "view_count",
+            "ticket_price", "ticket_purchase_link"
         ]
 
     def get_organizer_name_display(self, obj):

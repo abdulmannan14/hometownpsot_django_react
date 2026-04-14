@@ -137,11 +137,11 @@ export default function AdminEvents() {
   };
 
   const handleCreateEvent = () => {
-    navigate("/events/new");
+    navigate("/events/new?from=admin");
   };
 
   const handleEditEvent = (eventId) => {
-    navigate(`/events/${eventId}/edit`);
+    navigate(`/events/${eventId}/edit?from=admin`);
   };
 
   const handlePreviousPage = () => {

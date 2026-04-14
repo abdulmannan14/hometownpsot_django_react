@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import EventCard from '../components/EventCard';
 import {
   FaFacebook, FaTwitter, FaWhatsapp, FaLink, FaCheck,
   FaPhone, FaGlobe, FaMapMarkerAlt,
@@ -69,18 +70,6 @@ export default function VenueDetail() {
     if (is24h) return <span style={{ color: '#ff00e0', fontWeight: 600 }}>Open 24 Hours</span>;
     if (!open && !close) return <span style={{ color: '#ef4444' }}>Closed</span>;
     return <span className="text-white">{fmt12(open)} – {fmt12(close)}</span>;
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
-    });
-  };
-
-  const formatTime = (dateStr) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   };
 
   if (loading) {
@@ -248,7 +237,7 @@ export default function VenueDetail() {
 
           {/* Events at this venue */}
           <div className="lg:col-span-2">
-            <h2 className="text-xl font-bold text-white mb-6">
+            <h2 className="text-xl font-bold text-white" style={{ marginBottom: 24 }}>
               Upcoming Events
               {events.length > 0 && (
                 <span className="ml-2 text-sm font-normal px-2 py-0.5 rounded-full"
@@ -259,45 +248,23 @@ export default function VenueDetail() {
             </h2>
 
             {events.length > 0 ? (
-              <div className="space-y-4">
-                {events.map((event) => (
-                  <Link key={event.id} to={`/events/${event.id}`}
-                    className="flex gap-4 p-4 rounded-xl transition-all hover:border-[#ff00e040] group"
-                    style={{ background: '#1d191e', border: '1px solid #2a2a2a', display: 'flex', textDecoration: 'none' }}>
-
-                    {/* Event image */}
-                    <div className="flex-shrink-0 rounded-lg overflow-hidden" style={{ width: '80px', height: '80px' }}>
-                      {event.image ? (
-                        <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center" style={{ background: '#252525' }}>
-                          <span style={{ fontSize: '28px' }}>🎉</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Event info */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white truncate group-hover:text-[#ff00e0] transition-colors">
-                        {event.title}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {formatDate(event.date)} · {formatTime(event.date)}
-                      </p>
-                      {event.category && (
-                        <span className="inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: '#ff00e015', color: '#ff00e0' }}>
-                          {event.category.name}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex-shrink-0 flex items-center text-gray-600 group-hover:text-[#ff00e0] transition-colors">
-                      →
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                  {events.slice(0, 4).map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+                {events.length > 4 && (
+                  <div style={{ textAlign: 'center', marginTop: 20 }}>
+                    <Link to="/"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 24px', borderRadius: 8, border: '1px solid #ff00e0', color: '#ff00e0', fontWeight: 700, fontSize: 13, textDecoration: 'none', background: 'rgba(255,0,224,0.07)', transition: 'all .2s' }}
+                      onMouseEnter={e => { e.currentTarget.style.background = '#ff00e0'; e.currentTarget.style.color = '#fff'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,0,224,0.07)'; e.currentTarget.style.color = '#ff00e0'; }}>
+                      See More →
+                    </Link>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="rounded-xl p-12 text-center" style={{ background: '#1d191e', border: '1px solid #2a2a2a' }}>
                 <span style={{ fontSize: '36px', opacity: 0.3 }}>🎉</span>

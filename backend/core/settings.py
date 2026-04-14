@@ -112,3 +112,4 @@ CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS", default="http://localhost:3000"
 ).split(",")
 CORS_ALLOW_CREDENTIALS = True
+CORS_URLS_REGEX = r".*"  # include /media/ so the frontend can fetch images for Web Share API

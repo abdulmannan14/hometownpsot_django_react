@@ -46,15 +46,15 @@ export default function AdminLayout({ children }) {
           style={{
             textDecoration: "none",
             color: "#fff",
-            fontSize: "16px",
+            fontSize: "18px",
             fontWeight: 800,
             letterSpacing: "0.02em",
           }}
         >
-          Hometown<span style={{ color: "#ff00e0" }}>Post</span>
+          THE HOMETOWN <span style={{ color: "#ff00e0" }}>POST</span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span style={{ color: "#666", fontSize: "12px" }}>Admin: {user?.username}</span>
+          <span style={{ color: "#666", fontSize: "14px" }}>Admin: {user?.username}</span>
           <button
             onClick={handleLogout}
             style={{
@@ -63,7 +63,7 @@ export default function AdminLayout({ children }) {
               border: "1px solid #444",
               background: "transparent",
               color: "#e0e0e0",
-              fontSize: "12px",
+              fontSize: "14px",
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.2s",
@@ -113,7 +113,7 @@ export default function AdminLayout({ children }) {
                 padding: "10px 14px",
                 borderRadius: "6px",
                 textDecoration: "none",
-                fontSize: "14px",
+                fontSize: "16px",
                 fontWeight: 500,
                 color: isActive(to) ? "#ff00e0" : "#999",
                 background: isActive(to) ? "rgba(255,0,224,0.1)" : "transparent",
@@ -147,7 +147,7 @@ export default function AdminLayout({ children }) {
               padding: "10px 14px",
               borderRadius: "6px",
               textDecoration: "none",
-              fontSize: "13px",
+              fontSize: "15px",
               fontWeight: 500,
               color: "#666",
               transition: "all 0.2s",

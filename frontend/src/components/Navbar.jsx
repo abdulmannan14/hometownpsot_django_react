@@ -41,9 +41,9 @@ function SignupModal({ onClose }) {
           </svg>
         </div>
 
-        <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Post Your Event</h2>
-        <p style={{ color: "#888", fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
-          Create a free account to list your event on Reno's Hometown Post and reach your local crowd.
+        <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Post Your Event</h2>
+        <p style={{ color: "#888", fontSize: 16, lineHeight: 1.6, marginBottom: 28 }}>
+          Create a free account to list your event on THE HOMETOWN POST and reach your local crowd.
         </p>
 
         <Link
@@ -54,7 +54,7 @@ function SignupModal({ onClose }) {
             background: "#ff00e0",
             color: "#fff",
             fontWeight: 700,
-            fontSize: 14,
+            fontSize: 16,
             padding: "12px",
             borderRadius: 7,
             textDecoration: "none",
@@ -76,7 +76,7 @@ function SignupModal({ onClose }) {
             border: "1px solid #3a3a3a",
             color: "#aaa",
             fontWeight: 600,
-            fontSize: 14,
+            fontSize: 16,
             padding: "11px",
             borderRadius: 7,
             textDecoration: "none",
@@ -115,7 +115,7 @@ export default function Navbar() {
 
   const navLink = {
     color: "#e0e0e0",
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: 500,
     textDecoration: "none",
     transition: "color .2s",
@@ -129,8 +129,8 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link to="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-            <span style={{ color: "#fff", fontWeight: 800, fontSize: 18, letterSpacing: "0.02em", fontFamily: "Poppins, sans-serif" }}>
-              Reno's Hometown<span style={{ color: "#ff00e0" }}>Post</span>
+            <span style={{ color: "#fff", fontWeight: 800, fontSize: 20, letterSpacing: "0.02em", fontFamily: "Poppins, sans-serif" }}>
+              THE HOMETOWN <span style={{ color: "#ff00e0" }}>POST</span>
             </span>
           </Link>
 
@@ -141,7 +141,12 @@ export default function Navbar() {
               onMouseLeave={e => e.currentTarget.style.color = "#e0e0e0"}>
               Event Listings
             </Link>
-            <Link to="/events/venues" style={navLink}
+            <Link to="/categories" style={navLink}
+              onMouseEnter={e => e.currentTarget.style.color = "#ff00e0"}
+              onMouseLeave={e => e.currentTarget.style.color = "#e0e0e0"}>
+              Categories
+            </Link>
+          <Link to="/events/venues" style={navLink}
               onMouseEnter={e => e.currentTarget.style.color = "#ff00e0"}
               onMouseLeave={e => e.currentTarget.style.color = "#e0e0e0"}>
               Events by Venue
@@ -150,7 +155,14 @@ export default function Navbar() {
               <Link to="/dashboard" style={navLink}
                 onMouseEnter={e => e.currentTarget.style.color = "#ff00e0"}
                 onMouseLeave={e => e.currentTarget.style.color = "#e0e0e0"}>
-                My Favorites
+                My Favourite
+              </Link>
+            )}
+            {user && (
+              <Link to="/my-listings" style={navLink}
+                onMouseEnter={e => e.currentTarget.style.color = "#ff00e0"}
+                onMouseLeave={e => e.currentTarget.style.color = "#e0e0e0"}>
+                My Listings
               </Link>
             )}
 
@@ -164,7 +176,7 @@ export default function Navbar() {
                 background: "#ff00e0",
                 color: "#fff",
                 fontWeight: 700,
-                fontSize: 12,
+                fontSize: 14,
                 padding: "6px 16px",
                 borderRadius: 4,
                 border: "none",
@@ -182,9 +194,9 @@ export default function Navbar() {
             {/* Auth */}
             {user ? (
               <>
-                <span style={{ color: "#888", fontSize: 13 }}>{user.username}</span>
+                <span style={{ color: "#888", fontSize: 15 }}>{user.username}</span>
                 {(user.role === "admin" || user.is_staff) && (
-                  <Link to="/admin" style={{ background: "rgba(255,0,224,0.1)", border: "1px solid #ff00e0", color: "#ff00e0", fontWeight: 600, fontSize: 12, padding: "6px 16px", borderRadius: 4, textDecoration: "none", transition: "all .2s" }}
+                  <Link to="/admin" style={{ background: "rgba(255,0,224,0.1)", border: "1px solid #ff00e0", color: "#ff00e0", fontWeight: 600, fontSize: 14, padding: "6px 16px", borderRadius: 4, textDecoration: "none", transition: "all .2s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "#ff00e0"; e.currentTarget.style.color = "#000"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,0,224,0.1)"; e.currentTarget.style.color = "#ff00e0"; }}>
                     Admin
@@ -192,7 +204,7 @@ export default function Navbar() {
                 )}
                 <button
                   onClick={handleLogout}
-                  style={{ background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 12, padding: "6px 16px", borderRadius: 4, cursor: "pointer", fontFamily: "Poppins, sans-serif", transition: "border-color .2s, color .2s" }}
+                  style={{ background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 14, padding: "6px 16px", borderRadius: 4, cursor: "pointer", fontFamily: "Poppins, sans-serif", transition: "border-color .2s, color .2s" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "#ff00e0"; e.currentTarget.style.color = "#ff00e0"; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = "#444"; e.currentTarget.style.color = "#e0e0e0"; }}
                 >
@@ -202,13 +214,13 @@ export default function Navbar() {
             ) : (
               <>
                 <Link to="/login"
-                  style={{ background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 12, padding: "6px 16px", borderRadius: 4, textDecoration: "none", transition: "border-color .2s, color .2s" }}
+                  style={{ background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 14, padding: "6px 16px", borderRadius: 4, textDecoration: "none", transition: "border-color .2s, color .2s" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "#ff00e0"; e.currentTarget.style.color = "#ff00e0"; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = "#444"; e.currentTarget.style.color = "#e0e0e0"; }}>
                   Sign In
                 </Link>
                 <Link to="/register"
-                  style={{ background: "transparent", border: "1px solid #ff00e0", color: "#ff00e0", fontWeight: 700, fontSize: 12, padding: "6px 16px", borderRadius: 4, textDecoration: "none", transition: "all .2s" }}
+                  style={{ background: "transparent", border: "1px solid #ff00e0", color: "#ff00e0", fontWeight: 700, fontSize: 14, padding: "6px 16px", borderRadius: 4, textDecoration: "none", transition: "all .2s" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "#ff00e0"; e.currentTarget.style.color = "#fff"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#ff00e0"; }}>
                   Sign Up
@@ -236,11 +248,13 @@ export default function Navbar() {
           <div style={{ background: "#111", borderTop: "1px solid #2a2a2a", padding: "16px 20px" }}>
             {[
               { to: "/", label: "Event Listings" },
-              { to: "/events/venues", label: "Events by Venue" },
-              ...(user ? [{ to: "/dashboard", label: "My Favorites" }] : []),
+              { to: "/categories", label: "Categories" },
+            { to: "/events/venues", label: "Events by Venue" },
+              ...(user ? [{ to: "/dashboard", label: "My Favourite" }] : []),
+              ...(user ? [{ to: "/my-listings", label: "My Listings" }] : []),
             ].map(({ to, label }) => (
               <Link key={to} to={to} onClick={() => setMenuOpen(false)}
-                style={{ display: "block", color: "#e0e0e0", textDecoration: "none", fontSize: 14, padding: "8px 0", borderBottom: "1px solid #1e1e1e" }}>
+                style={{ display: "block", color: "#e0e0e0", textDecoration: "none", fontSize: 16, padding: "8px 0", borderBottom: "1px solid #1e1e1e" }}>
                 {label}
               </Link>
             ))}
@@ -251,7 +265,7 @@ export default function Navbar() {
               style={{
                 display: "block", width: "100%", textAlign: "left",
                 background: "none", border: "none",
-                color: "#ff00e0", fontWeight: 700, fontSize: 14,
+                color: "#ff00e0", fontWeight: 700, fontSize: 16,
                 padding: "10px 0", borderBottom: "1px solid #1e1e1e",
                 cursor: "pointer", fontFamily: "Poppins, sans-serif",
               }}
@@ -261,15 +275,15 @@ export default function Navbar() {
 
             <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
               {user ? (
-                <button onClick={handleLogout} style={{ flex: 1, background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 13, padding: "8px", borderRadius: 4, cursor: "pointer", fontFamily: "Poppins, sans-serif" }}>
+                <button onClick={handleLogout} style={{ flex: 1, background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 15, padding: "8px", borderRadius: 4, cursor: "pointer", fontFamily: "Poppins, sans-serif" }}>
                   Sign Out
                 </button>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setMenuOpen(false)} style={{ flex: 1, textAlign: "center", background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 13, padding: "8px", borderRadius: 4, textDecoration: "none" }}>
+                  <Link to="/login" onClick={() => setMenuOpen(false)} style={{ flex: 1, textAlign: "center", background: "transparent", border: "1px solid #444", color: "#e0e0e0", fontWeight: 600, fontSize: 15, padding: "8px", borderRadius: 4, textDecoration: "none" }}>
                     Sign In
                   </Link>
-                  <Link to="/register" onClick={() => setMenuOpen(false)} style={{ flex: 1, textAlign: "center", background: "#ff00e0", color: "#fff", fontWeight: 700, fontSize: 13, padding: "8px", borderRadius: 4, textDecoration: "none" }}>
+                  <Link to="/register" onClick={() => setMenuOpen(false)} style={{ flex: 1, textAlign: "center", background: "#ff00e0", color: "#fff", fontWeight: 700, fontSize: 15, padding: "8px", borderRadius: 4, textDecoration: "none" }}>
                     Sign Up
                   </Link>
                 </>

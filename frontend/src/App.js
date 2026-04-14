@@ -12,6 +12,7 @@ import EventDetailNew from "./pages/EventDetailNew";
 import CreateEvent from "./pages/CreateEvent";
 import EditEvent from "./pages/EditEvent";
 import Dashboard from "./pages/Dashboard";
+import MyListings from "./pages/MyListings";
 import EventsByVenue from "./pages/EventsByVenue";
 import VenueDetail from "./pages/VenueDetail";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -21,6 +22,7 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminCategories from "./pages/AdminCategories";
 import AdminExpiredEvents from "./pages/AdminExpiredEvents";
 import AdminSettings from "./pages/AdminSettings";
+import CategoryView from "./pages/CategoryView";
 import RegisterPopup from "./components/RegisterPopup";
 
 function Footer() {
@@ -31,7 +33,7 @@ function Footer() {
           {/* Brand */}
           <div>
             <div className="text-white font-bold text-xl tracking-wide mb-3">
-              Hometown<span style={{ color: "#ff00e0" }}>Post</span>
+              THE HOMETOWN <span style={{ color: "#ff00e0" }}>POST</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
               Local Event Listings &amp; Poster Art.<br />
@@ -82,7 +84,7 @@ function Footer() {
         </div>
 
         <div style={{ borderTop: "1px solid #2a2a2a" }} className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-600">&copy; {new Date().getFullYear()} HomeTownPost Events. All rights reserved.</p>
+          <p className="text-xs text-gray-600">&copy; {new Date().getFullYear()} THE HOMETOWN POST. All rights reserved.</p>
           <div className="flex gap-5">
             <a href="#!" className="text-xs text-gray-600 hover:text-[#ff00e0] transition-colors">Privacy Policy</a>
             <a href="#!" className="text-xs text-gray-600 hover:text-[#ff00e0] transition-colors">Terms of Use</a>
@@ -107,12 +109,15 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/categories" element={<CategoryView />} />
+          <Route path="/categories/:slug" element={<CategoryView />} />
           <Route path="/events/venues" element={<EventsByVenue />} />
           <Route path="/venues/:id" element={<VenueDetail />} />
           <Route path="/events/:id" element={<EventDetailNew />} />
           <Route path="/events/new" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
           <Route path="/events/:id/edit" element={<ProtectedRoute><EditEvent /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />

@@ -6,11 +6,16 @@
 
 * { box-sizing: border-box; }
 
+html {
+  font-size: 18px;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   background-color: #191919;
   color: #ffffff;
   margin: 0;
+  font-size: 16px;
 }
 
 @layer components {
@@ -56,4 +61,16 @@ body {
   .magenta { color: #ff00e0; }
   .bg-magenta { background: #ff00e0; }
   .border-magenta { border-color: #ff00e0; }
+}
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .event-grid {
+    grid-template-columns: 1fr;
+  }
 }

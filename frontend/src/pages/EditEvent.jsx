@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import api from "../api/axios";
 import LocationAutocomplete from "../components/LocationAutocomplete";
 
 export default function EditEvent() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromAdmin = searchParams.get("from") === "admin";
   const [categories, setCategories] = useState([]);
   const [venues, setVenues] = useState([]);
   const [errors, setErrors] = useState({});
@@ -20,6 +22,7 @@ export default function EditEvent() {
     title: "", description: "", date: "", end_date: "",
     location: "", city: "", category: "", venue: "",
     organizer_name: "", organizer_email: "", organizer_phone: "", website: "",
+    ticket_price: "", ticket_purchase_link: "",
     latitude: "", longitude: "",
   });
 
@@ -42,6 +45,8 @@ export default function EditEvent() {
           organizer_email: event.organizer_email || "",
           organizer_phone: event.organizer_phone || "",
           website: event.website || "",
+          ticket_price: event.ticket_price != null ? event.ticket_price : "",
+          ticket_purchase_link: event.ticket_purchase_link || "",
           latitude: event.latitude || "",
           longitude: event.longitude || "",
         });
@@ -91,7 +96,7 @@ export default function EditEvent() {
         newImages.forEach((img) => galleryForm.append("images", img));
         await api.post(`/events/${id}/images/`, galleryForm, { headers: { "Content-Type": "multipart/form-data" } });
       }
-      navigate(`/events/${id}`);
+      navigate(fromAdmin ? "/admin/events" : `/events/${id}`);
     } catch (err) {
       setErrors(err.response?.data || {});
     } finally {
@@ -247,6 +252,32 @@ export default function EditEvent() {
                 <p className="text-xs mt-2 text-gray-500">Add more images to the gallery</p>
               </div>
             </div>
+            <div style={{ borderTop: "1px solid #2a2a2a" }} className="pt-6">
+              <h3 className="text-sm font-bold text-white mb-4">Tickets</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className={labelClass}>Ticket Price (USD)</label>
+                  <div style={{ position: "relative" }}>
+                    <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#888", fontSize: 14, pointerEvents: "none" }}>$</span>
+                    <input
+                      type="number" name="ticket_price" value={form.ticket_price} onChange={handleChange}
+                      min="0" step="0.01" className="input w-full" style={{ ...inputStyle, paddingLeft: 26 }}
+                      placeholder="0.00 — leave blank if free"
+                    />
+                  </div>
+                  {fieldError("ticket_price")}
+                </div>
+                <div>
+                  <label className={labelClass}>Ticket Purchase Link</label>
+                  <input
+                    type="url" name="ticket_purchase_link" value={form.ticket_purchase_link} onChange={handleChange}
+                    className="input w-full" style={inputStyle} placeholder="https://eventbrite.com/..."
+                  />
+                  {fieldError("ticket_purchase_link")}
+                </div>
+              </div>
+            </div>
+
             <div style={{ borderTop: "1px solid #2a2a2a" }} className="pt-6">
               <h3 className="text-sm font-bold text-white mb-4">Organizer Details</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

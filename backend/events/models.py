@@ -21,6 +21,7 @@ class Venue(models.Model):
     youtube = models.URLField(blank=True, null=True)
     tiktok = models.URLField(blank=True, null=True)
     linkedin = models.URLField(blank=True, null=True)
+    is_featured = models.BooleanField(default=False)
     # Operational hours
     weekday_open = models.TimeField(null=True, blank=True)
     weekday_close = models.TimeField(null=True, blank=True)
@@ -83,6 +84,8 @@ class Event(models.Model):
     website = models.URLField(blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    ticket_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    ticket_purchase_link = models.URLField(blank=True, null=True)
     is_archived = models.BooleanField(default=False)
     view_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -26,41 +26,62 @@ export default function EventsByVenue() {
   const [geoStatus, setGeoStatus] = useState("idle"); // idle | requesting | done | denied
   const [filteredVenues, setFilteredVenues] = useState([]);
 
+  // Request GPS on mount so list is sorted immediately
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    setGeoStatus("requesting");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoStatus("done");
+      },
+      () => setGeoStatus("denied"),
+      { timeout: 8000 }
+    );
+  }, []);
+
   useEffect(() => {
     api.get('/events/venues/')
       .then(({ data }) => {
         const list = Array.isArray(data) ? data : (data.results || []);
         setAllVenues(list);
-        setFilteredVenues(list);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  // Re-apply filter whenever radius, coords, or venues list changes
+  // Re-apply filter + sort whenever radius, coords, or venues list changes
   useEffect(() => {
-    if (!radius) {
-      setFilteredVenues(allVenues);
-      return;
+    let list = radius && userCoords
+      ? allVenues.filter(
+          (v) =>
+            v.latitude != null &&
+            v.longitude != null &&
+            haversineMiles(userCoords.lat, userCoords.lng, v.latitude, v.longitude) <= parseInt(radius)
+        )
+      : [...allVenues];
+
+    // Sort by distance if we have coords
+    if (userCoords) {
+      list.sort((a, b) => {
+        const da = a.latitude != null && a.longitude != null
+          ? haversineMiles(userCoords.lat, userCoords.lng, a.latitude, a.longitude)
+          : Infinity;
+        const db = b.latitude != null && b.longitude != null
+          ? haversineMiles(userCoords.lat, userCoords.lng, b.latitude, b.longitude)
+          : Infinity;
+        return da - db;
+      });
     }
-    if (!userCoords) return; // waiting for GPS
-    const r = parseInt(radius);
-    const nearby = allVenues.filter(
-      (v) =>
-        v.latitude != null &&
-        v.longitude != null &&
-        haversineMiles(userCoords.lat, userCoords.lng, v.latitude, v.longitude) <= r
-    );
-    setFilteredVenues(nearby);
+
+    setFilteredVenues(list);
   }, [radius, userCoords, allVenues]);
 
   const handleRadiusChange = (e) => {
     const value = e.target.value;
     setRadius(value);
 
-    if (!value) return; // "Any Distance" — no GPS needed
-
-    if (userCoords) return; // already have coords
+    if (!value || userCoords) return; // already have coords or clearing filter
 
     if (!navigator.geolocation) {
       setGeoStatus("denied");
@@ -233,7 +254,14 @@ export default function EventsByVenue() {
 
                 {/* Info */}
                 <div className="p-5">
-                  <h3 className="text-lg font-bold text-white mb-1 truncate">{venue.name}</h3>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                    <h3 className="text-lg font-bold text-white truncate">{venue.name}</h3>
+                    {userCoords && venue.latitude != null && venue.longitude != null && (
+                      <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#ff00e0', background: 'rgba(255,0,224,0.1)', border: '1px solid rgba(255,0,224,0.3)', borderRadius: 20, padding: '2px 8px', whiteSpace: 'nowrap' }}>
+                        {(() => { const d = haversineMiles(userCoords.lat, userCoords.lng, venue.latitude, venue.longitude); return d < 0.1 ? '< 0.1 mi' : `${d.toFixed(1)} mi`; })()}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-gray-500 text-sm mb-3 line-clamp-1">{venue.address}</p>
                   {venue.description && (
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">{venue.description}</p>

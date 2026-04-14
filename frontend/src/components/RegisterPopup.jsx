@@ -82,15 +82,15 @@ export default function RegisterPopup() {
           {showSignupPrompt ? "❤️" : "💥"}
         </div>
 
-        <h2 style={{ color: "#fff", fontWeight: 700, fontSize: "20px", marginBottom: "8px" }}>
+        <h2 style={{ color: "#fff", fontWeight: 700, fontSize: "22px", marginBottom: "8px" }}>
           {showSignupPrompt
             ? "Save your favorites"
-            : <>Join Hometown<span style={{ color: "#ff00e0" }}>Post</span></>}
+            : <>Join THE HOMETOWN <span style={{ color: "#ff00e0" }}>POST</span></>}
         </h2>
-        <p style={{ color: "#888", fontSize: "14px", lineHeight: 1.6, marginBottom: "28px" }}>
+        <p style={{ color: "#888", fontSize: "16px", lineHeight: 1.6, marginBottom: "28px" }}>
           {showSignupPrompt
             ? "Create a free account to save events and build your personal favorites list."
-            : "Discover local events, save your favorites, and promote your own events to the Reno community."}
+            : "Discover local events, save your favorites, and promote your own events to the local community."}
         </p>
 
         <button
@@ -98,7 +98,7 @@ export default function RegisterPopup() {
           style={{
             width: "100%", padding: "12px", borderRadius: "8px",
             border: "none", background: "#ff00e0",
-            color: "#fff", fontWeight: 700, fontSize: "14px",
+            color: "#fff", fontWeight: 700, fontSize: "16px",
             cursor: "pointer", marginBottom: "12px",
           }}
         >
@@ -110,7 +110,7 @@ export default function RegisterPopup() {
           style={{
             width: "100%", padding: "11px", borderRadius: "8px",
             border: "1px solid #333", background: "transparent",
-            color: "#aaa", fontWeight: 600, fontSize: "13px", cursor: "pointer",
+            color: "#aaa", fontWeight: 600, fontSize: "15px", cursor: "pointer",
             marginBottom: "8px",
           }}
         >
@@ -121,7 +121,7 @@ export default function RegisterPopup() {
           onClick={handleClose}
           style={{
             background: "transparent", border: "none",
-            color: "#555", fontSize: "12px", cursor: "pointer",
+            color: "#555", fontSize: "14px", cursor: "pointer",
           }}
         >
           Maybe later

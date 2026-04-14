@@ -39,6 +39,7 @@ export default function AdminVenues() {
   const emptyForm = {
     name: "", address: "", city: "", latitude: "", longitude: "",
     website: "", phone: "", description: "", capacity: "",
+    is_featured: false,
     facebook: "", instagram: "", twitter: "", youtube: "", tiktok: "", linkedin: "",
     weekday_open: "", weekday_close: "", weekday_is_24h: false,
     saturday_open: "", saturday_close: "", saturday_is_24h: false,
@@ -119,6 +120,7 @@ export default function AdminVenues() {
       fd.append("weekday_is_24h",  formData.weekday_is_24h  ? "true" : "false");
       fd.append("saturday_is_24h", formData.saturday_is_24h ? "true" : "false");
       fd.append("sunday_is_24h",   formData.sunday_is_24h   ? "true" : "false");
+      fd.append("is_featured",     formData.is_featured     ? "true" : "false");
 
       let venueId;
       if (editingVenue) {
@@ -179,6 +181,7 @@ export default function AdminVenues() {
       sunday_open: venue.sunday_open || "",
       sunday_close: venue.sunday_close || "",
       sunday_is_24h: venue.sunday_is_24h || false,
+      is_featured: venue.is_featured || false,
     });
     setExistingMainImage(venue.image || null);
     setExistingGallery(venue.images || []);
@@ -312,6 +315,23 @@ export default function AdminVenues() {
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={labelStyle}>Description</label>
                   <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} placeholder="Describe the venue..." style={{ ...inputStyle, resize: "vertical" }} />
+                </div>
+
+                {/* Featured toggle */}
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "12px", borderRadius: "6px", background: formData.is_featured ? "rgba(255,0,224,0.08)" : "#252525", border: `1px solid ${formData.is_featured ? "rgba(255,0,224,0.4)" : "#2a2a2a"}`, transition: "all .2s" }}>
+                    <input
+                      type="checkbox"
+                      name="is_featured"
+                      checked={formData.is_featured}
+                      onChange={handleInputChange}
+                      style={{ accentColor: "#ff00e0", width: "16px", height: "16px", cursor: "pointer" }}
+                    />
+                    <div>
+                      <span style={{ color: formData.is_featured ? "#ff00e0" : "#ccc", fontSize: "13px", fontWeight: 700 }}>⭐ Featured Venue</span>
+                      <p style={{ color: "#555", fontSize: "11px", margin: "2px 0 0" }}>Featured venues appear in the homepage "Nearby Venues" widget, sorted by distance from the user.</p>
+                    </div>
+                  </label>
                 </div>
 
                 {/* Social Media */}
@@ -524,7 +544,12 @@ export default function AdminVenues() {
                             </div>
                           )}
                           <div>
-                            <p className="font-semibold text-white">{venue.name}</p>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <p className="font-semibold text-white">{venue.name}</p>
+                              {venue.is_featured && (
+                                <span style={{ background: "rgba(255,0,224,0.15)", border: "1px solid rgba(255,0,224,0.4)", color: "#ff00e0", fontSize: "10px", fontWeight: 700, padding: "1px 6px", borderRadius: "4px" }}>⭐ Featured</span>
+                              )}
+                            </div>
                             {venue.images?.length > 0 && (
                               <p style={{ color: "#666", fontSize: "11px" }}>{venue.images.length} gallery {venue.images.length === 1 ? "image" : "images"}</p>
                             )}

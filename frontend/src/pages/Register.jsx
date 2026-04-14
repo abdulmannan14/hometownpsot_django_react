@@ -71,7 +71,7 @@ export default function Register() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-white font-bold text-2xl tracking-wide mb-2">
-            Hometown<span style={{ color: "#ff00e0" }}>Post</span>
+            THE HOMETOWN <span style={{ color: "#ff00e0" }}>POST</span>
           </div>
           <h1 className="text-xl font-semibold text-white">Create an Account</h1>
           <p className="text-gray-500 text-sm mt-1">Start posting events in your community</p>

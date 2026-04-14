@@ -54,7 +54,7 @@ export default function AdminSettings() {
         {/* Header */}
         <div style={{ marginBottom: "32px" }}>
           <h1 className="text-3xl font-bold text-white">Site Settings</h1>
-          <p className="text-gray-500 text-sm mt-1">Configure global settings for the HomeTownPost platform.</p>
+          <p className="text-gray-500 text-sm mt-1">Configure global settings for THE HOMETOWN POST platform.</p>
         </div>
 
         {loading ? (
@@ -69,7 +69,7 @@ export default function AdminSettings() {
             <div className="rounded-xl p-6" style={{ background: "#1d191e", border: "1px solid #2a2a2a" }}>
               <div style={{ marginBottom: "20px" }}>
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  📍 Events Near You — Default Radius
+                  📍 Upcoming Events — Default Radius
                 </h2>
                 <p className="text-gray-500 text-sm mt-1">
                   This radius is used on the homepage to show events near a user's GPS location.
@@ -176,7 +176,7 @@ export default function AdminSettings() {
               <ul style={{ color: "#666", fontSize: "13px", lineHeight: "1.8", paddingLeft: "16px" }}>
                 <li>When a user visits the homepage, their browser requests their GPS location.</li>
                 <li>If they allow it, the site fetches approved events within the configured radius.</li>
-                <li>These events appear in the <strong style={{ color: "#aaa" }}>"Events Near You"</strong> section above the main listings.</li>
+                <li>These events appear in the <strong style={{ color: "#aaa" }}>"Upcoming Events"</strong> section above the main listings.</li>
                 <li>Only events with saved latitude/longitude coordinates are shown in this section.</li>
                 <li>If a user denies location access, the section is hidden gracefully.</li>
               </ul>
